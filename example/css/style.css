@@ -1,0 +1,70 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+}
+
+h2, h3 {
+  font-weight: 300;
+}
+
+#map {
+    width: 60%;
+    height: 500px;
+    display: block;
+    float: left;
+}
+
+#controls {
+  display: block;
+  width: 40%;
+  float: right;
+  background: #fff;
+}
+
+#map, #controls {
+  width: 100%;
+}
+
+#controls .wrapper {
+  padding: 30px;
+}
+
+#controls .control {
+  width: 20%;
+  display: inline-block;
+  text-align: center;
+}
+
+#controls .github-button { color: #fff; }
+
+#controls .control.range {
+  width: 33%;
+}
+
+#controls .control input {
+  display: inline-block;
+  margin-right: 10px;
+  text-align: right;
+}
+
+#geojson {
+  display: block;
+  width: 100%;
+  height: 200px;
+}
+
+@media (min-width:900px) {
+  #map {
+    width: 60%;
+    height: 100%;
+  }
+
+  #controls {
+    width: 40%;
+  }
+
+  #controls .control.range {
+    display: inline-block;
+  }
+}

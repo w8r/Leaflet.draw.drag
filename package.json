@@ -1,0 +1,38 @@
+{
+  "name": "leaflet.draw.drag",
+  "version": "0.0.1",
+  "description": "Drag feature functionality for Leaflet.draw",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 1",
+    "start": "npm run watch-js & npm run watch-css & serve -p 3001",
+    "watch-css": "catw -c 'lessc -' 'src/*.less' -o dist/leaflet.lss.css -v",
+    "watch-js": "watchify -v -d example/js/app.js -o example/js/bundle.js",
+    "build-less": "lessc src/leaflet.lss.less > dist/leaflet.lss.css",
+    "compress-less": "lessc -x src/leaflet.lss.less > dist/leaflet.lss.min.css",
+    "build-css": "npm run build-less && npm run compress-less",
+    "build-js": "browserify -s L.Control.LineStringSelect -u leaflet index.js -o dist/L.Control.LineStringSelect.js",
+    "build-js-no-rbush": "browserify -s L.Control.LineStringSelect -u leaflet -u rbush index.js -o dist/L.Control.LineStringSelect.no-rbush.js",
+    "compress": "npm run compress-js && npm run compress-js-no-rbush",
+    "compress-js": "browserify -s L.Control.LineStringSelect -u leaflet index.js | uglifyjs --comments -m -c drop_console=true,warnings=false > dist/L.Control.LineStringSelect.min.js",
+    "compress-js-no-rbush": "browserify -s L.Control.LineStringSelect -u rbush -u leaflet index.js | uglifyjs --comments -m -c drop_console=true,warnings=false > dist/L.Control.LineStringSelect.no-rbush.min.js",
+    "build": "npm run build-js && npm run build-js-no-rbush && npm run compress && npm run build-css"
+  },
+  "keywords": [
+    "leaflet",
+    "draw",
+    "drag",
+    "polygon"
+  ],
+  "author": "Alexander Milevski <info@w8r.name>",
+  "license": "MIT",
+  "dependencies": {
+    "leaflet": "^0.7.3",
+    "leaflet-draw": "^0.2.3"
+  },
+  "devDependencies": {
+    "browserify": "^8.1.1",
+    "serve": "^1.4.0",
+    "watchify": "^2.2.1"
+  }
+}
