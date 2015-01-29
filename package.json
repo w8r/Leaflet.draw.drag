@@ -1,6 +1,6 @@
 {
   "name": "leaflet-draw-drag",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Drag feature functionality for Leaflet.draw",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "watch": "watchify -v -d example/js/app.js -o example/js/bundle.js",
     "build-js": "cat ./node_modules/leaflet-path-drag/dist/L.Path.Drag-src.js ./src/Edit.Poly.Drag.js > ./dist/Edit.Poly.Drag-src.js",
     "compress": "uglifyjs ./dist/Edit.Poly.Drag-src.js -o ./dist/Edit.Poly.Drag.js -m",
-    "build": "npm run build-js && npm run compress"
+    "build": "npm run build-js && npm run compress",
+    "release": "git push origin master && git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master && npm publish"
   },
   "keywords": [
     "leaflet",
@@ -25,7 +26,7 @@
   "dependencies": {
     "leaflet": "^0.7.3",
     "leaflet-draw": "^0.2.3",
-    "leaflet-path-drag": "^0.1.1"
+    "leaflet-path-drag": "^0.1.2"
   },
   "devDependencies": {
     "browserify": "^8.1.1",

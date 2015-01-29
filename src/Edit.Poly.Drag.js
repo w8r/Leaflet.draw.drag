@@ -36,7 +36,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    */
   _enableDragging: function() {
     if (!this._poly.dragging) {
-      this._poly.dragging = new L.Path.Drag(this._poly);
+      this._poly.dragging = new L.Handler.PathDrag(this._poly);
     }
     this._poly.dragging.enable();
     this._poly
