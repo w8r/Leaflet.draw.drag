@@ -1,6 +1,6 @@
 {
   "name": "leaflet-draw-drag",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Drag feature functionality for Leaflet.draw",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "dependencies": {
     "leaflet": "^0.7.3",
     "leaflet-draw": "^0.2.3",
-    "leaflet-path-drag": "^0.1.0"
+    "leaflet-path-drag": "^0.1.1"
   },
   "devDependencies": {
     "browserify": "^8.1.1",
