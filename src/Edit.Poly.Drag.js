@@ -1,5 +1,5 @@
 /**
- * Dragging routines for poly handler
+ * Dragging routines for rectangles
  */
 
 "use strict";

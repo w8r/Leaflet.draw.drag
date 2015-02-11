@@ -31,7 +31,7 @@
   "devDependencies": {
     "browserify": "^8.1.1",
     "serve": "^1.4.0",
-    "uglifyjs": "^2.3.6",
+    "uglify-js": "^2.3.6",
     "watchify": "^2.2.1"
   }
 }
