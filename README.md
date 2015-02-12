@@ -52,6 +52,16 @@ polygon
     .on('dragend',   onDragEnd);
 ```
 
+## Development
+
+```
+npm install && npm start
+```
+Build
+```
+npm run build
+```
+
 ## License
 
 The MIT License (MIT)
