@@ -9,7 +9,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * @override
    */
-  addHooks: function () {
+  addHooks: function() {
     if (this._shape._map) {
       if (!this._markerGroup) {
         this._enableDragging();
@@ -22,7 +22,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * @override
    */
-  removeHooks: function () {
+  removeHooks: function() {
     if (this._shape._map) {
       this._shape._map.removeLayer(this._markerGroup);
       this._disableDragging();
@@ -34,24 +34,24 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * @override
    */
-  _createMoveMarker: function () {
+  _createMoveMarker: function() {
     // noop
   },
 
   /**
    * @override
    */
-  _resize: function (latlng) {
-    // Update the shape based on the current position of this corner and the opposite point
+  _resize: function(latlng) {
+    // Update the shape based on the current position of
+    // this corner and the opposite point
     this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
   },
 
   /**
    * @override
    */
-  _onMarkerDragEnd: function (e) {
+  _onMarkerDragEnd: function(e) {
     this._toggleCornerMarkers(1);
-
     this._repositionCornerMarkers();
 
     L.Edit.SimpleShape.prototype._onMarkerDragEnd.call(this, e);
@@ -60,7 +60,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * Adds drag start listeners
    */
-  _enableDragging: function () {
+  _enableDragging: function() {
     if (!this._shape.dragging) {
       this._shape.dragging = new L.Handler.PathDrag(this._shape);
     }
@@ -73,7 +73,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * Removes drag start listeners
    */
-  _disableDragging: function () {
+  _disableDragging: function() {
     this._shape.dragging.disable();
     this._shape
       .off('dragstart', this._onStartDragFeature, this)
@@ -92,7 +92,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    * Dragging stopped, apply
    * @param  {L.MouseEvent} evt
    */
-  _onStopDragFeature: function () {
+  _onStopDragFeature: function() {
     var polygon = this._shape;
     for (var i = 0, len = polygon._latlngs.length; i < len; i++) {
       // update marker
@@ -108,6 +108,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
         marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
       }
     }
+    // this._moveMarker.setLatLng(polygon.getBounds().getCenter());
 
     // show vertices
     this._shape._map.addLayer(this._markerGroup);

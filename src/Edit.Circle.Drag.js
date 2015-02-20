@@ -9,7 +9,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * @override
    */
-  addHooks: function () {
+  addHooks: function() {
     if (this._shape._map) {
       this._map = this._shape._map;
       if (!this._markerGroup) {
@@ -23,12 +23,12 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * @override
    */
-  removeHooks: function () {
+  removeHooks: function() {
     if (this._shape._map) {
       for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
         this._unbindMarker(this._resizeMarkers[i]);
       }
-      
+
       this._disableDragging();
       this._resizeMarkers = null;
       this._map.removeLayer(this._markerGroup);
@@ -41,12 +41,12 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * @override
    */
-  _createMoveMarker: function () {
+  _createMoveMarker: function() {
     // noop
   },
 
 
-  _resize: function (latlng) {
+  _resize: function(latlng) {
     var center = this._shape.getLatLng();
     var radius = center.distanceTo(latlng);
 
@@ -56,7 +56,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * Adds drag start listeners
    */
-  _enableDragging: function () {
+  _enableDragging: function() {
     if (!this._shape.dragging) {
       this._shape.dragging = new L.Handler.PathDrag(this._shape);
     }
@@ -69,7 +69,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * Removes drag start listeners
    */
-  _disableDragging: function () {
+  _disableDragging: function() {
     this._shape.dragging.disable();
     this._shape
       .off('dragstart', this._onStartDragFeature, this)
@@ -88,18 +88,11 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    * Dragging stopped, apply
    * @param  {L.MouseEvent} evt
    */
-  _onStopDragFeature: function () {
-    var circle = this._shape;
+  _onStopDragFeature: function() {
+    var center = this._shape.getLatLng();
 
-    // update marker
-    var marker = this._resizeMarkers[0];
-    var center = circle.getLatLng();
-    var resizemarkerPoint = this._getResizeMarkerPoint(center);
-
-    marker.setLatLng(resizemarkerPoint);
-
-    // this one's needed to update the path
-    // marker._origLatLng = circle._latlng;
+    //this._moveMarker.setLatLng(center);
+    this._resizeMarkers[0].setLatLng(this._getResizeMarkerPoint(center));
 
     // show resize marker
     this._shape._map.addLayer(this._markerGroup);

@@ -12,9 +12,12 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
   attribution: '&copy; ' +
     '<a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+var c = new L.LatLng(22.36721, 114.14486);
+var circle = L.circle(c, 4000);
 
 // Initialise the FeatureGroup to store editable layers
 var drawnItems = global.drawnItems = L.geoJson(data).addTo(map);
+drawnItems.addLayer(circle);
 map.addLayer(drawnItems);
 
 // Initialise the draw control and pass it the FeatureGroup of editable layers
