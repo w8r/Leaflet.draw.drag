@@ -23,7 +23,13 @@ map.addLayer(drawnItems);
 // Initialise the draw control and pass it the FeatureGroup of editable layers
 var drawControl = global.drawControl = new L.Control.Draw({
   edit: {
-    featureGroup: drawnItems
+    featureGroup: drawnItems,
+    edit: {
+      selectedPathOptions: {
+        maintainColor: true,
+        moveMarkers: true
+      }
+    }
   }
 });
 map.addControl(drawControl);
@@ -40,11 +46,22 @@ map.on('draw:created', function(e) {
 });
 
 ////////////////////////////////////////////////////////////////////////////////
-var toolbar = (function() {
+var toolbar = global.toolbar = (function() {
   for (var type in drawControl._toolbars) {
     if (drawControl._toolbars[type] instanceof L.EditToolbar) {
       return drawControl._toolbars[type];
     }
   }
 })();
+
 toolbar._modes.edit.handler.enable();
+
+L.DomEvent.on(document.querySelector('.centroids'), 'change', function(e) {
+  setTimeout(function() {
+    //if (e.target.checked) {
+    L.EditToolbar.Edit.MOVE_MARKERS = e.target.checked;
+    toolbar._modes.edit.handler.disable();
+    toolbar._modes.edit.handler.enable();
+    //}
+  }, 50);
+});

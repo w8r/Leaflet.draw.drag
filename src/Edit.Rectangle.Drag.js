@@ -2,8 +2,6 @@
  * Dragging routines for poly handler
  */
 
-"use strict";
-
 L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
 
   /**
@@ -34,17 +32,11 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
   /**
    * @override
    */
-  _createMoveMarker: function() {
-    // noop
-  },
-
-  /**
-   * @override
-   */
   _resize: function(latlng) {
     // Update the shape based on the current position of
     // this corner and the opposite point
     this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
+    this._updateMoveMarker();
   },
 
   /**
@@ -86,6 +78,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    */
   _onStartDragFeature: function() {
     this._shape._map.removeLayer(this._markerGroup);
+    this._shape.fire('editstart');
   },
 
   /**
@@ -112,6 +105,7 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
 
     // show vertices
     this._shape._map.addLayer(this._markerGroup);
+    this._updateMoveMarker();
     this._fireEdit();
   }
 });

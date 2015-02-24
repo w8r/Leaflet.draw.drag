@@ -308,13 +308,326 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
   };
 
 })();
+// TODO: dismiss that on Leaflet 0.8.x release
+
+L.Polygon.include( /** @lends L.Polygon.prototype */ {
+
+  /**
+   * @return {L.LatLng}
+   */
+  getCenter: function() {
+    var i, j, len, p1, p2, f, area, x, y,
+      points = this._parts[0];
+
+    // polygon centroid algorithm; only uses the first ring if there are multiple
+
+    area = x = y = 0;
+
+    for (i = 0, len = points.length, j = len - 1; i < len; j = i++) {
+      p1 = points[i];
+      p2 = points[j];
+
+      f = p1.y * p2.x - p2.y * p1.x;
+      x += (p1.x + p2.x) * f;
+      y += (p1.y + p2.y) * f;
+      area += f * 3;
+    }
+
+    return this._map.layerPointToLatLng([x / area, y / area]);
+  }
+
+});
+"use strict";
+
+/**
+ * Static flag for move markers
+ * @type {Boolean}
+ */
+L.EditToolbar.Edit.MOVE_MARKERS = false;
+
+L.EditToolbar.Edit.include( /** @lends L.EditToolbar.Edit.prototype */ {
+
+  /**
+   * @override
+   */
+  initialize: function(map, options) {
+    L.EditToolbar.Edit.MOVE_MARKERS = !!options.selectedPathOptions.moveMarkers;
+    this._initialize(map, options);
+  },
+
+  /**
+   * @param  {L.Map}  map
+   * @param  {Object} options
+   */
+  _initialize: L.EditToolbar.Edit.prototype.initialize
+
+});
+/**
+ * Mainly central marker routines
+ */
+
+L.Edit.SimpleShape.include( /** @lends L.Edit.SimpleShape.prototype */ {
+
+  /**
+   * Put move marker into center
+   */
+  _updateMoveMarker: function() {
+    if (this._moveMarker) {
+      this._moveMarker.setLatLng(this._getShapeCenter());
+    }
+  },
+
+  /**
+   * Shape centroid
+   * @return {L.LatLng}
+   */
+  _getShapeCenter: function() {
+    return this._shape.getBounds().getCenter();
+  },
+
+  /**
+   * @override
+   */
+  _createMoveMarker: function() {
+    if (L.EditToolbar.Edit.MOVE_MARKERS) {
+      this._moveMarker = this._createMarker(this._getShapeCenter(),
+        this.options.moveIcon);
+    }
+  }
+
+});
+
+/**
+ * Override this if you don't want the central marker
+ * @type {Boolean}
+ */
+L.Edit.SimpleShape.mergeOptions({
+  moveMarker: false
+});
+/**
+ * Dragging routines for circle
+ */
+
+L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
+
+  /**
+   * @override
+   */
+  addHooks: function() {
+    if (this._shape._map) {
+      this._map = this._shape._map;
+      if (!this._markerGroup) {
+        this._enableDragging();
+        this._initMarkers();
+      }
+      this._shape._map.addLayer(this._markerGroup);
+    }
+  },
+
+  /**
+   * @override
+   */
+  removeHooks: function() {
+    if (this._shape._map) {
+      for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
+        this._unbindMarker(this._resizeMarkers[i]);
+      }
+
+      this._disableDragging();
+      this._resizeMarkers = null;
+      this._map.removeLayer(this._markerGroup);
+      delete this._markerGroup;
+    }
+
+    this._map = null;
+  },
+
+  /**
+   * @override
+   */
+  _createMoveMarker: L.Edit.SimpleShape.prototype._createMoveMarker,
+
+  /**
+   * Change
+   * @param  {L.LatLng} latlng
+   */
+  _resize: function(latlng) {
+    var center = this._shape.getLatLng();
+    var radius = center.distanceTo(latlng);
+
+    this._shape.setRadius(radius);
+
+    this._updateMoveMarker();
+  },
+
+  /**
+   * Adds drag start listeners
+   */
+  _enableDragging: function() {
+    if (!this._shape.dragging) {
+      this._shape.dragging = new L.Handler.PathDrag(this._shape);
+    }
+    this._shape.dragging.enable();
+    this._shape
+      .on('dragstart', this._onStartDragFeature, this)
+      .on('dragend', this._onStopDragFeature, this);
+  },
+
+  /**
+   * Removes drag start listeners
+   */
+  _disableDragging: function() {
+    this._shape.dragging.disable();
+    this._shape
+      .off('dragstart', this._onStartDragFeature, this)
+      .off('dragend', this._onStopDragFeature, this);
+  },
+
+  /**
+   * Start drag
+   * @param  {L.MouseEvent} evt
+   */
+  _onStartDragFeature: function() {
+    this._shape._map.removeLayer(this._markerGroup);
+    this._shape.fire('editstart');
+  },
+
+  /**
+   * Dragging stopped, apply
+   * @param  {L.MouseEvent} evt
+   */
+  _onStopDragFeature: function() {
+    var center = this._shape.getLatLng();
+
+    //this._moveMarker.setLatLng(center);
+    this._resizeMarkers[0].setLatLng(this._getResizeMarkerPoint(center));
+
+    // show resize marker
+    this._shape._map.addLayer(this._markerGroup);
+    this._updateMoveMarker();
+    this._fireEdit();
+  }
+});
 /**
  * Dragging routines for poly handler
  */
 
-"use strict";
+L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
+
+  /**
+   * @override
+   */
+  addHooks: function() {
+    if (this._shape._map) {
+      if (!this._markerGroup) {
+        this._enableDragging();
+        this._initMarkers();
+      }
+      this._shape._map.addLayer(this._markerGroup);
+    }
+  },
+
+  /**
+   * @override
+   */
+  removeHooks: function() {
+    if (this._shape._map) {
+      this._shape._map.removeLayer(this._markerGroup);
+      this._disableDragging();
+      delete this._markerGroup;
+      delete this._markers;
+    }
+  },
+
+  /**
+   * @override
+   */
+  _resize: function(latlng) {
+    // Update the shape based on the current position of
+    // this corner and the opposite point
+    this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
+    this._updateMoveMarker();
+  },
+
+  /**
+   * @override
+   */
+  _onMarkerDragEnd: function(e) {
+    this._toggleCornerMarkers(1);
+    this._repositionCornerMarkers();
+
+    L.Edit.SimpleShape.prototype._onMarkerDragEnd.call(this, e);
+  },
+
+  /**
+   * Adds drag start listeners
+   */
+  _enableDragging: function() {
+    if (!this._shape.dragging) {
+      this._shape.dragging = new L.Handler.PathDrag(this._shape);
+    }
+    this._shape.dragging.enable();
+    this._shape
+      .on('dragstart', this._onStartDragFeature, this)
+      .on('dragend', this._onStopDragFeature, this);
+  },
+
+  /**
+   * Removes drag start listeners
+   */
+  _disableDragging: function() {
+    this._shape.dragging.disable();
+    this._shape
+      .off('dragstart', this._onStartDragFeature, this)
+      .off('dragend', this._onStopDragFeature, this);
+  },
+
+  /**
+   * Start drag
+   * @param  {L.MouseEvent} evt
+   */
+  _onStartDragFeature: function() {
+    this._shape._map.removeLayer(this._markerGroup);
+    this._shape.fire('editstart');
+  },
+
+  /**
+   * Dragging stopped, apply
+   * @param  {L.MouseEvent} evt
+   */
+  _onStopDragFeature: function() {
+    var polygon = this._shape;
+    for (var i = 0, len = polygon._latlngs.length; i < len; i++) {
+      // update marker
+      var marker = this._resizeMarkers[i];
+      marker.setLatLng(polygon._latlngs[i]);
+
+      // this one's needed to update the path
+      marker._origLatLng = polygon._latlngs[i];
+      if (marker._middleLeft) {
+        marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
+      }
+      if (marker._middleRight) {
+        marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
+      }
+    }
+    // this._moveMarker.setLatLng(polygon.getBounds().getCenter());
+
+    // show vertices
+    this._shape._map.addLayer(this._markerGroup);
+    this._updateMoveMarker();
+    this._fireEdit();
+  }
+});
+/**
+ * Dragging routines for poly handler
+ */
 
 L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
+
+  // store methods to call them in overrides
+  __createMarker: L.Edit.Poly.prototype._createMarker,
+  __removeMarker: L.Edit.Poly.prototype._removeMarker,
 
   /**
    * @override
@@ -324,9 +637,45 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
+        // Create center marker
+        this._createMoveMarker();
       }
       this._poly._map.addLayer(this._markerGroup);
     }
+  },
+
+  /**
+   * @override
+   */
+  _createMoveMarker: function() {
+    if (L.EditToolbar.Edit.MOVE_MARKERS && (this._poly instanceof L.Polygon)) {
+      this._moveMarker = new L.Marker(this._getShapeCenter(), {
+        icon: this.options.moveIcon
+      });
+      this._moveMarker.on('mousedown', this._delegateToShape, this);
+      this._markerGroup.addLayer(this._moveMarker);
+    }
+  },
+
+  /**
+   * Start dragging through the marker
+   * @param  {L.MouseEvent} evt
+   */
+  _delegateToShape: function(evt) {
+    var poly = this._shape || this._poly;
+    var marker = evt.target;
+    poly.fire('mousedown', L.Util.extend(evt, {
+      containerPoint: L.DomUtil.getPosition(marker._icon)
+        .add(poly._map._getMapPanePos())
+    }));
+  },
+
+  /**
+   * Polygon centroid
+   * @return {L.LatLng}
+   */
+  _getShapeCenter: function() {
+    return this._poly.getCenter();
   },
 
   /**
@@ -370,6 +719,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    */
   _onStartDragFeature: function(evt) {
     this._poly._map.removeLayer(this._markerGroup);
+    this._poly.fire('editstart');
   },
 
   /**
@@ -395,225 +745,69 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
 
     // show vertices
     this._poly._map.addLayer(this._markerGroup);
+    L.Edit.SimpleShape.prototype._updateMoveMarker.call(this);
     this._fireEdit();
+  },
+
+  /**
+   * Copy from simple shape
+   */
+  _updateMoveMarker: L.Edit.SimpleShape.prototype._updateMoveMarker,
+
+  /**
+   * @override
+   */
+  _createMarker: function(latlng, index) {
+    var marker = this.__createMarker(latlng, index);
+    marker
+      .on('dragstart', this._hideMoveMarker, this)
+      .on('dragend', this._showUpdateMoveMarker, this);
+    return marker;
+  },
+
+  /**
+   * @override
+   */
+  _removeMarker: function(marker) {
+    this.__removeMarker(marker);
+    marker
+      .off('dragstart', this._hideMoveMarker, this)
+      .off('dragend', this._showUpdateMoveMarker, this);
+  },
+
+  /**
+   * Hide move marker while dragging a vertex
+   */
+  _hideMoveMarker: function() {
+    if (this._moveMarker) {
+      this._markerGroup.removeLayer(this._moveMarker);
+    }
+  },
+
+  /**
+   * Show and update move marker
+   */
+  _showUpdateMoveMarker: function() {
+    if (this._moveMarker) {
+      this._markerGroup.addLayer(this._moveMarker);
+      this._updateMoveMarker();
+    }
   }
 
 });
+
 /**
- * Dragging routines for circle
+ * @type {L.DivIcon}
  */
-
-"use strict";
-
-L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
-
-  /**
-   * @override
-   */
-  addHooks: function() {
-    if (this._shape._map) {
-      this._map = this._shape._map;
-      if (!this._markerGroup) {
-        this._enableDragging();
-        this._initMarkers();
-      }
-      this._shape._map.addLayer(this._markerGroup);
-    }
-  },
-
-  /**
-   * @override
-   */
-  removeHooks: function() {
-    if (this._shape._map) {
-      for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
-        this._unbindMarker(this._resizeMarkers[i]);
-      }
-
-      this._disableDragging();
-      this._resizeMarkers = null;
-      this._map.removeLayer(this._markerGroup);
-      delete this._markerGroup;
-    }
-
-    this._map = null;
-  },
-
-  /**
-   * @override
-   */
-  _createMoveMarker: function() {
-    // noop
-  },
-
-
-  _resize: function(latlng) {
-    var center = this._shape.getLatLng();
-    var radius = center.distanceTo(latlng);
-
-    this._shape.setRadius(radius);
-  },
-
-  /**
-   * Adds drag start listeners
-   */
-  _enableDragging: function() {
-    if (!this._shape.dragging) {
-      this._shape.dragging = new L.Handler.PathDrag(this._shape);
-    }
-    this._shape.dragging.enable();
-    this._shape
-      .on('dragstart', this._onStartDragFeature, this)
-      .on('dragend', this._onStopDragFeature, this);
-  },
-
-  /**
-   * Removes drag start listeners
-   */
-  _disableDragging: function() {
-    this._shape.dragging.disable();
-    this._shape
-      .off('dragstart', this._onStartDragFeature, this)
-      .off('dragend', this._onStopDragFeature, this);
-  },
-
-  /**
-   * Start drag
-   * @param  {L.MouseEvent} evt
-   */
-  _onStartDragFeature: function() {
-    this._shape._map.removeLayer(this._markerGroup);
-  },
-
-  /**
-   * Dragging stopped, apply
-   * @param  {L.MouseEvent} evt
-   */
-  _onStopDragFeature: function() {
-    var center = this._shape.getLatLng();
-
-    //this._moveMarker.setLatLng(center);
-    this._resizeMarkers[0].setLatLng(this._getResizeMarkerPoint(center));
-
-    // show resize marker
-    this._shape._map.addLayer(this._markerGroup);
-    this._fireEdit();
-  }
+L.Edit.Poly.prototype.options.moveIcon = new L.DivIcon({
+  iconSize: new L.Point(8, 8),
+  className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move'
 });
+
 /**
- * Dragging routines for poly handler
+ * Override this if you don't want the central marker
+ * @type {Boolean}
  */
-
-"use strict";
-
-L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
-
-  /**
-   * @override
-   */
-  addHooks: function() {
-    if (this._shape._map) {
-      if (!this._markerGroup) {
-        this._enableDragging();
-        this._initMarkers();
-      }
-      this._shape._map.addLayer(this._markerGroup);
-    }
-  },
-
-  /**
-   * @override
-   */
-  removeHooks: function() {
-    if (this._shape._map) {
-      this._shape._map.removeLayer(this._markerGroup);
-      this._disableDragging();
-      delete this._markerGroup;
-      delete this._markers;
-    }
-  },
-
-  /**
-   * @override
-   */
-  _createMoveMarker: function() {
-    // noop
-  },
-
-  /**
-   * @override
-   */
-  _resize: function(latlng) {
-    // Update the shape based on the current position of
-    // this corner and the opposite point
-    this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
-  },
-
-  /**
-   * @override
-   */
-  _onMarkerDragEnd: function(e) {
-    this._toggleCornerMarkers(1);
-    this._repositionCornerMarkers();
-
-    L.Edit.SimpleShape.prototype._onMarkerDragEnd.call(this, e);
-  },
-
-  /**
-   * Adds drag start listeners
-   */
-  _enableDragging: function() {
-    if (!this._shape.dragging) {
-      this._shape.dragging = new L.Handler.PathDrag(this._shape);
-    }
-    this._shape.dragging.enable();
-    this._shape
-      .on('dragstart', this._onStartDragFeature, this)
-      .on('dragend', this._onStopDragFeature, this);
-  },
-
-  /**
-   * Removes drag start listeners
-   */
-  _disableDragging: function() {
-    this._shape.dragging.disable();
-    this._shape
-      .off('dragstart', this._onStartDragFeature, this)
-      .off('dragend', this._onStopDragFeature, this);
-  },
-
-  /**
-   * Start drag
-   * @param  {L.MouseEvent} evt
-   */
-  _onStartDragFeature: function() {
-    this._shape._map.removeLayer(this._markerGroup);
-  },
-
-  /**
-   * Dragging stopped, apply
-   * @param  {L.MouseEvent} evt
-   */
-  _onStopDragFeature: function() {
-    var polygon = this._shape;
-    for (var i = 0, len = polygon._latlngs.length; i < len; i++) {
-      // update marker
-      var marker = this._resizeMarkers[i];
-      marker.setLatLng(polygon._latlngs[i]);
-
-      // this one's needed to update the path
-      marker._origLatLng = polygon._latlngs[i];
-      if (marker._middleLeft) {
-        marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
-      }
-      if (marker._middleRight) {
-        marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
-      }
-    }
-    // this._moveMarker.setLatLng(polygon.getBounds().getCenter());
-
-    // show vertices
-    this._shape._map.addLayer(this._markerGroup);
-    this._fireEdit();
-  }
+L.Edit.Poly.mergeOptions({
+  moveMarker: false
 });

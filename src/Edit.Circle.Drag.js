@@ -2,8 +2,6 @@
  * Dragging routines for circle
  */
 
-"use strict";
-
 L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
 
   /**
@@ -41,16 +39,19 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   /**
    * @override
    */
-  _createMoveMarker: function() {
-    // noop
-  },
+  _createMoveMarker: L.Edit.SimpleShape.prototype._createMoveMarker,
 
-
+  /**
+   * Change
+   * @param  {L.LatLng} latlng
+   */
   _resize: function(latlng) {
     var center = this._shape.getLatLng();
     var radius = center.distanceTo(latlng);
 
     this._shape.setRadius(radius);
+
+    this._updateMoveMarker();
   },
 
   /**
@@ -82,6 +83,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    */
   _onStartDragFeature: function() {
     this._shape._map.removeLayer(this._markerGroup);
+    this._shape.fire('editstart');
   },
 
   /**
@@ -96,6 +98,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
 
     // show resize marker
     this._shape._map.addLayer(this._markerGroup);
+    this._updateMoveMarker();
     this._fireEdit();
   }
 });
