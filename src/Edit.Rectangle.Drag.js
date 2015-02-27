@@ -106,6 +106,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
     // show vertices
     this._shape._map.addLayer(this._markerGroup);
     this._updateMoveMarker();
+
+    this._repositionCornerMarkers();
     this._fireEdit();
   }
 });
