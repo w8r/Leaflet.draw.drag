@@ -313,7 +313,8 @@ L.Path.prototype._initEvents = function() {
     this.dragging.disable();
   }
 };
-(function() {
+//1.0 has abandoned multipolys in favour of standard ones
+(L.version.split('.')[0] === "0")&&(function() {
 
   // listen and propagate dragstart on sub-layers
   L.FeatureGroup.EVENTS += ' dragstart';
