@@ -28,7 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "leaflet": "^1.0.0-beta.1",
-    "leaflet-draw": "git+https://github.com/Leaflet/Leaflet.draw#leaflet-master",
+    "leaflet-draw": "git+https://github.com/tetarenko/Leaflet.draw#rebuild",
     "leaflet-path-drag": "git+https://github.com/w8r/Leaflet.Path.Drag#leaflet-1.0"
   },
   "devDependencies": {
