@@ -405,14 +405,15 @@ L.Path.prototype._initEvents = function() {
 })();
 // TODO: dismiss that on Leaflet 0.8.x release
 
-L.Polygon.include( /** @lends L.Polygon.prototype */ {
+L.Polygon.include( L.Polygon.prototype.getCenter ? {} :
+  /** @lends L.Polygon.prototype */ {
 
   /**
    * @return {L.LatLng}
    */
   getCenter: function() {
-    var i, j, len, p1, p2, f, area, x, y,
-      points = this._parts[0];
+    var i, j, len, p1, p2, f, area, x, y;
+    var points = this._originalPoints;
 
     // polygon centroid algorithm; only uses the first ring if there are multiple
 
