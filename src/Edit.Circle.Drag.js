@@ -103,8 +103,13 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   }
 });
 
+// store original letLatLng to call in override
 L.Circle.prototype.__getLatLng = L.Circle.prototype.getLatLng;
 
+/**
+ * Return transformed point in case if dragging is enabled and in progress,
+ * otherwise - call original method.
+ */
 L.Circle.prototype.getLatLng = function() {
   if (this.dragging && this.dragging._matrix) {
     return this.dragging._transformPoint(this.dragging._matrix, this._latlng);
