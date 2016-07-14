@@ -154,6 +154,11 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
      */
     this._dragInProgress = false;
 
+    /**
+     * @type {Boolean}
+     */
+    this._dragMoved = false;
+
   },
 
 
@@ -188,6 +193,7 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     if (!L.Path.CANVAS && path) {
       L.DomUtil.removeClass(path, className);
     }
+    this._dragMoved = false;
   },
 
 
@@ -195,7 +201,7 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
    * @return {Boolean}
    */
   moved: function() {
-    return this._path._dragMoved;
+    return this._dragMoved;
   },
 
 
@@ -219,10 +225,14 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     this._dragStartPoint = evt.containerPoint.clone();
     this._matrix = [1, 0, 0, 1, 0, 0];
 
+    if(this._path._point) {
+      this._point = this._path._point.clone();
+    }
+
     this._path._map
       .on('mousemove', this._onDrag, this)
       .on('mouseup', this._onDragEnd, this)
-    this._path._dragMoved = false;
+    this._dragMoved = false;
   },
 
 
@@ -234,27 +244,37 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     var x = evt.containerPoint.x;
     var y = evt.containerPoint.y;
 
-    var dx = x - this._startPoint.x;
-    var dy = y - this._startPoint.y;
+    var matrix     = this._matrix;
+    var path       = this._path;
+    var startPoint = this._startPoint;
 
-    if (!this._path._dragMoved && (dx || dy)) {
-      this._path._dragMoved = true;
-      this._path.fire('dragstart');
+    var dx = x - startPoint.x;
+    var dy = y - startPoint.y;
 
-      if (this._path._popup) {
-        this._path._popup._close();
-        this._path.off('click', this._path._openPopup, this._path);
+    if (!this._dragMoved && (dx || dy)) {
+      this._dragMoved = true;
+      path.fire('dragstart');
+
+      if (path._popup) {
+        path._popup._close();
+        path.off('click', path._openPopup, path);
       }
     }
 
-    this._matrix[4] += dx;
-    this._matrix[5] += dy;
+    matrix[4] += dx;
+    matrix[5] += dy;
 
-    this._startPoint.x = x;
-    this._startPoint.y = y;
+    startPoint.x = x;
+    startPoint.y = y;
 
-    this._path._applyTransform(this._matrix);
-    this._path.fire('drag');
+    path._applyTransform(matrix);
+
+    if (path._point) { // L.Circle, L.CircleMarker
+      path._point.x = this._point.x + matrix[4];
+      path._point.y = this._point.y + matrix[5];
+    }
+
+    path.fire('drag');
     L.DomEvent.stop(evt.originalEvent);
   },
 
@@ -265,6 +285,8 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
    */
   _onDragEnd: function(evt) {
     L.DomEvent.stop(evt);
+    L.DomEvent._fakeStop({ type: 'click' });
+
     this._dragInProgress = false;
     // undo container transform
     this._path._resetTransform();
@@ -290,8 +312,8 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
 
     this._matrix = null;
     this._startPoint = null;
+    this._point = null;
     this._dragStartPoint = null;
-    this._path._dragMoved = false;
   },
 
 
@@ -347,7 +369,7 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     if (path._point) { // L.Circle
       path._latlng = projection.unproject(
         projection.project(path._latlng)._add(diff));
-      path._point._add(px);
+      path._point = this._point._add(px);
     } else if (path._originalPoints) { // everything else
       for (i = 0, len = path._originalPoints.length; i < len; i++) {
         latlng = path._latlngs[i];
@@ -423,7 +445,6 @@ L.Polyline.prototype.getLatLngs = function() {
     return this._getLatLngs();
   }
 };
-
 (function() {
 
   // listen and propagate dragstart on sub-layers
@@ -650,6 +671,8 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
     this._shape.setRadius(radius);
 
     this._updateMoveMarker();
+
+    this._map.fire('draw:editresize', {layer: this._shape});
   },
 
   /**
@@ -739,6 +762,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
     // this corner and the opposite point
     this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
     this._updateMoveMarker();
+    
+    this._map.fire('draw:editresize', {layer: this._shape});
   },
 
   /**
