@@ -52,6 +52,8 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
     this._shape.setRadius(radius);
 
     this._updateMoveMarker();
+
+    this._map.fire('draw:editresize', {layer: this._shape});
   },
 
   /**
