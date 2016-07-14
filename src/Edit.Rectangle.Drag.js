@@ -37,6 +37,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
     // this corner and the opposite point
     this._shape.setBounds(L.latLngBounds(latlng, this._oppositeCorner));
     this._updateMoveMarker();
+    
+    this._map.fire('draw:editresize', {layer: this._shape});
   },
 
   /**
