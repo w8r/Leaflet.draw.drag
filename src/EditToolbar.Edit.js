@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Static flag for move markers
  * @type {Boolean}

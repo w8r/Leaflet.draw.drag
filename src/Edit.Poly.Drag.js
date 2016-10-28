@@ -1,7 +1,7 @@
 /**
  * Dragging routines for poly handler
  */
-
+console.log(L.Edit.Poly.prototype._initMarkers);
 L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
 
   // store methods to call them in overrides
@@ -12,15 +12,13 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    * @override
    */
   addHooks: function() {
-    if (this._poly._map) {
-      if (!this._markerGroup) {
-        this._enableDragging();
-        this._initMarkers();
-        // Create center marker
-        this._createMoveMarker();
-      }
-      this._poly._map.addLayer(this._markerGroup);
-    }
+    this._initHandlers();
+		this._eachVertexHandler(function (handler) {
+			handler.addHooks();
+		});
+    // Create center marker
+    this._createMoveMarker();
+    this._enableDragging();
   },
 
   /**
@@ -32,7 +30,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
         icon: this.options.moveIcon
       });
       this._moveMarker.on('mousedown', this._delegateToShape, this);
-      this._markerGroup.addLayer(this._moveMarker);
+      this._getMarkerGroup().addLayer(this._moveMarker);
     }
   },
 
@@ -42,6 +40,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    */
   _delegateToShape: function(evt) {
     var poly = this._shape || this._poly;
+    console.log(poly);
     var marker = evt.target;
     poly.fire('mousedown', L.Util.extend(evt, {
       containerPoint: L.DomUtil.getPosition(marker._icon)
@@ -57,12 +56,20 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
     return this._poly.getCenter();
   },
 
+  _getMarkerGroup: function () {
+    var group = this._map;
+    if (this._verticesHandlers.length) {
+      group = this._verticesHandlers[0]._markerGroup;
+    }
+    return group;
+  },
+
   /**
    * @override
    */
-  removeHooks: function() {
+  ____removeHooks: function() {
     if (this._poly._map) {
-      this._poly._map.removeLayer(this._markerGroup);
+      this._poly._map.removeLayer(this._getMarkerGroup());
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
@@ -97,7 +104,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    * @param  {L.MouseEvent} evt
    */
   _onStartDragFeature: function(evt) {
-    this._poly._map.removeLayer(this._markerGroup);
+    this._poly._map.removeLayer(this._getMarkerGroup());
     this._poly.fire('editstart');
   },
 
@@ -123,7 +130,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
     }
 
     // show vertices
-    this._poly._map.addLayer(this._markerGroup);
+    this._poly._map.addLayer(this._getMarkerGroup());
     L.Edit.SimpleShape.prototype._updateMoveMarker.call(this);
     this._fireEdit();
   },
@@ -159,7 +166,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    */
   _hideMoveMarker: function() {
     if (this._moveMarker) {
-      this._markerGroup.removeLayer(this._moveMarker);
+      this._getMarkerGroup().removeLayer(this._moveMarker);
     }
   },
 
@@ -168,7 +175,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    */
   _showUpdateMoveMarker: function() {
     if (this._moveMarker) {
-      this._markerGroup.addLayer(this._moveMarker);
+      this._getMarkerGroup().addLayer(this._moveMarker);
       this._updateMoveMarker();
     }
   }
