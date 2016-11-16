@@ -571,7 +571,9 @@ L.EditToolbar.Edit.include( /** @lends L.EditToolbar.Edit.prototype */ {
    * @override
    */
   initialize: function(map, options) {
-    L.EditToolbar.Edit.MOVE_MARKERS = !!options.selectedPathOptions.moveMarkers;
+    if(options && options.selectedPathOptions) {
+      L.EditToolbar.Edit.MOVE_MARKERS = !!options.selectedPathOptions.moveMarkers;
+    }
     this._initialize(map, options);
   },
 
