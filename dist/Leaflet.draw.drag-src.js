@@ -849,11 +849,11 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
  * Dragging routines for poly handler
  */
 
-L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
+L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */ {
 
   // store methods to call them in overrides
-  __createMarker: L.Edit.Poly.prototype._createMarker,
-  __removeMarker: L.Edit.Poly.prototype._removeMarker,
+  __createMarker: L.Edit.PolyVerticesEdit.prototype._createMarker,
+  __removeMarker: L.Edit.PolyVerticesEdit.prototype._removeMarker,
 
   /**
    * @override
@@ -1025,7 +1025,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
 /**
  * @type {L.DivIcon}
  */
-L.Edit.Poly.prototype.options.moveIcon = new L.DivIcon({
+L.Edit.PolyVerticesEdit.prototype.options.moveIcon = new L.DivIcon({
   iconSize: new L.Point(8, 8),
   className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move'
 });
@@ -1034,6 +1034,6 @@ L.Edit.Poly.prototype.options.moveIcon = new L.DivIcon({
  * Override this if you don't want the central marker
  * @type {Boolean}
  */
-L.Edit.Poly.mergeOptions({
+L.Edit.PolyVerticesEdit.mergeOptions({
   moveMarker: false
 });

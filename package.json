@@ -25,14 +25,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "leaflet": "^0.7.3",
-    "leaflet-draw": "^0.2.4",
-    "leaflet-path-drag": "^0.7.7"
+    "leaflet": "^0.7.7",
+    "leaflet-draw": "^0.4.3",
+    "leaflet-path-drag": "^0.1.16"
   },
   "devDependencies": {
     "browserify": "^13.1.1",
     "st": "^1.2.0",
-    "uglify-js": "^2.3.6",
+    "uglify-js": "^2.7.3",
     "watchify": "^3.7.0"
   }
 }
