@@ -638,6 +638,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   addHooks: function() {
     if (this._shape._map) {
       this._map = this._shape._map;
+      this._shape.setStyle(this._shape.options.editing);
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -650,6 +651,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    * @override
    */
   removeHooks: function() {
+    this._shape.setStyle(this._shape.options.original);
     if (this._shape._map) {
       for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
         this._unbindMarker(this._resizeMarkers[i]);
@@ -743,6 +745,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    */
   addHooks: function() {
     if (this._shape._map) {
+      this._map = this._shape._map;
+      this._shape.setStyle(this._shape.options.editing);
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -755,12 +759,14 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    * @override
    */
   removeHooks: function() {
+    this._shape.setStyle(this._shape.options.original);
     if (this._shape._map) {
       this._shape._map.removeLayer(this._markerGroup);
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
     }
+    this._map = null;
   },
 
   /**
@@ -861,7 +867,18 @@ L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */
    * @override
    */
   addHooks: function() {
+    var poly = this._poly;
+
+    if (!(poly instanceof L.Polygon)) {
+      poly.options.fill = false;
+      if (poly.options.editing) {
+        poly.options.editing.fill = false;
+      }
+    }
+
+    poly.setStyle(poly.options.editing);
     if (this._poly._map) {
+      this._map = this._poly._map; // Set map
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -910,12 +927,16 @@ L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */
    * @override
    */
   removeHooks: function() {
+    var poly = this._poly;
+
+    poly.setStyle(poly.options.original);
     if (this._poly._map) {
       this._poly._map.removeLayer(this._markerGroup);
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
     }
+		this._map = null;
   },
 
   /**
