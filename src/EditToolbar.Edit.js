@@ -1,3 +1,12 @@
+
+/**
+ * Drag feature functionality for Leaflet.draw
+ * @preserve
+ * @license MIT
+ * @author Alexander Milevski <info@w8r.name>
+ */
+
+
 /**
  * Static flag for move markers
  * @type {Boolean}
