@@ -48,7 +48,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    * @param  {L.LatLng} latlng
    */
   _resize: function(latlng) {
-    var center = this._shape.getLatLng();
+    var center = this._shape._latlng;
     var radius = center.distanceTo(latlng);
 
     this._shape.setRadius(radius);
@@ -95,7 +95,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    * @param  {L.MouseEvent} evt
    */
   _onStopDragFeature: function() {
-    var center = this._shape.getLatLng();
+    var center = this._shape._latlng;
 
     //this._moveMarker.setLatLng(center);
     this._resizeMarkers[0].setLatLng(this._getResizeMarkerPoint(center));
@@ -106,3 +106,18 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
     this._fireEdit();
   }
 });
+
+// store original letLatLng to call in override
+L.Circle.prototype.__getLatLng = L.Circle.prototype.getLatLng;
+
+/**
+ * Return transformed point in case if dragging is enabled and in progress,
+ * otherwise - call original method.
+ */
+L.Circle.prototype.getLatLng = function() {
+  if (this.dragging && this.dragging._matrix) {
+    return this.dragging._transformPoint(this.dragging._matrix, this._latlng);
+  } else {
+    return this.__getLatLng();
+  }
+};
