@@ -1,6 +1,6 @@
 # Leaflet.Draw.Drag
 
-[![npm version](https://badge.fury.io/js/leaflet-draw-drag.svg)](http://badge.fury.io/js/leaflet-draw-drag)
+[![npm version](https://badge.fury.io/js/leaflet-draw-drag.svg)](https://badge.fury.io/js/leaflet-draw-drag)
 
 Drag feature functionality for [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw).
 
