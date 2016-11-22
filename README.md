@@ -11,7 +11,7 @@ Uses [Leaflet.Path.Drag](https://github.com/w8r/Leaflet.Path.Drag)
 If you want `leaflet@0.7.x` + `leaflet.draw@0.2.x` support, use `leaflet-0.7` branch or
 npm versions `leaflet-draw-drag@^0.1.7`
 
-## [Demo](https://w8r.github.io/Leaflet.draw.drag/example/)
+## [Demo](https://w8r.github.io/Leaflet.draw.drag/example/index.html)
 
 ## Usage
 
