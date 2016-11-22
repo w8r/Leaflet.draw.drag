@@ -9,6 +9,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    */
   addHooks: function() {
     if (this._shape._map) {
+      this._map = this._shape._map;
+      this._shape.setStyle(this._shape.options.editing);
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -21,12 +23,14 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    * @override
    */
   removeHooks: function() {
+    this._shape.setStyle(this._shape.options.original);
     if (this._shape._map) {
       this._shape._map.removeLayer(this._markerGroup);
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
     }
+    this._map = null;
   },
 
   /**
@@ -89,18 +93,20 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    */
   _onStopDragFeature: function() {
     var polygon = this._shape;
-    for (var i = 0, len = polygon._latlngs.length; i < len; i++) {
-      // update marker
-      var marker = this._resizeMarkers[i];
-      marker.setLatLng(polygon._latlngs[i]);
+    for (var j = 0, jj = polygon._latlngs.length; j < jj; j++) {
+      for (var i = 0, len = polygon._latlngs[j].length; i < len; i++) {
+        // update marker
+        var marker = this._resizeMarkers[i];
+        marker.setLatLng(polygon._latlngs[j][i]);
 
-      // this one's needed to update the path
-      marker._origLatLng = polygon._latlngs[i];
-      if (marker._middleLeft) {
-        marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
-      }
-      if (marker._middleRight) {
-        marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
+        // this one's needed to update the path
+        marker._origLatLng = polygon._latlngs[j][i];
+        if (marker._middleLeft) {
+          marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
+        }
+        if (marker._middleRight) {
+          marker._middleRight.setLatLng(this._getMiddleLatLng(marker, marker._next));
+        }
       }
     }
     // this._moveMarker.setLatLng(polygon.getBounds().getCenter());

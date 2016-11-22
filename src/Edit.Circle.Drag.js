@@ -10,6 +10,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
   addHooks: function() {
     if (this._shape._map) {
       this._map = this._shape._map;
+      this._shape.setStyle(this._shape.options.editing);
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -22,6 +23,7 @@ L.Edit.Circle.include( /** @lends L.Edit.Circle.prototype */ {
    * @override
    */
   removeHooks: function() {
+    this._shape.setStyle(this._shape.options.original);
     if (this._shape._map) {
       for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
         this._unbindMarker(this._resizeMarkers[i]);

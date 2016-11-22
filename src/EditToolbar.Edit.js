@@ -1,3 +1,12 @@
+
+/**
+ * Drag feature functionality for Leaflet.draw
+ * @preserve
+ * @license MIT
+ * @author Alexander Milevski <info@w8r.name>
+ */
+
+
 /**
  * Static flag for move markers
  * @type {Boolean}
@@ -10,7 +19,9 @@ L.EditToolbar.Edit.include( /** @lends L.EditToolbar.Edit.prototype */ {
    * @override
    */
   initialize: function(map, options) {
-    L.EditToolbar.Edit.MOVE_MARKERS = !!options.selectedPathOptions.moveMarkers;
+    if(options && options.selectedPathOptions) {
+      L.EditToolbar.Edit.MOVE_MARKERS = !!options.selectedPathOptions.moveMarkers;
+    }
     this._initialize(map, options);
   },
 
