@@ -9,6 +9,8 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    */
   addHooks: function() {
     if (this._shape._map) {
+      this._map = this._shape._map;
+      this._shape.setStyle(this._shape.options.editing);
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -21,12 +23,14 @@ L.Edit.Rectangle.include( /** @lends L.Edit.Rectangle.prototype */ {
    * @override
    */
   removeHooks: function() {
+    this._shape.setStyle(this._shape.options.original);
     if (this._shape._map) {
       this._shape._map.removeLayer(this._markerGroup);
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
     }
+    this._map = null;
   },
 
   /**

@@ -2,17 +2,28 @@
  * Dragging routines for poly handler
  */
 
-L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
+L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */ {
 
   // store methods to call them in overrides
-  __createMarker: L.Edit.Poly.prototype._createMarker,
-  __removeMarker: L.Edit.Poly.prototype._removeMarker,
+  __createMarker: L.Edit.PolyVerticesEdit.prototype._createMarker,
+  __removeMarker: L.Edit.PolyVerticesEdit.prototype._removeMarker,
 
   /**
    * @override
    */
   addHooks: function() {
+    var poly = this._poly;
+
+    if (!(poly instanceof L.Polygon)) {
+      poly.options.fill = false;
+      if (poly.options.editing) {
+        poly.options.editing.fill = false;
+      }
+    }
+
+    poly.setStyle(poly.options.editing);
     if (this._poly._map) {
+      this._map = this._poly._map; // Set map
       if (!this._markerGroup) {
         this._enableDragging();
         this._initMarkers();
@@ -61,12 +72,16 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
    * @override
    */
   removeHooks: function() {
+    var poly = this._poly;
+
+    poly.setStyle(poly.options.original);
     if (this._poly._map) {
       this._poly._map.removeLayer(this._markerGroup);
       this._disableDragging();
       delete this._markerGroup;
       delete this._markers;
     }
+		this._map = null;
   },
 
   /**
@@ -178,7 +193,7 @@ L.Edit.Poly.include( /** @lends L.Edit.Poly.prototype */ {
 /**
  * @type {L.DivIcon}
  */
-L.Edit.Poly.prototype.options.moveIcon = new L.DivIcon({
+L.Edit.PolyVerticesEdit.prototype.options.moveIcon = new L.DivIcon({
   iconSize: new L.Point(8, 8),
   className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move'
 });
@@ -187,6 +202,6 @@ L.Edit.Poly.prototype.options.moveIcon = new L.DivIcon({
  * Override this if you don't want the central marker
  * @type {Boolean}
  */
-L.Edit.Poly.mergeOptions({
+L.Edit.PolyVerticesEdit.mergeOptions({
   moveMarker: false
 });
