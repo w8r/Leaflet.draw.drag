@@ -122,14 +122,20 @@ L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */
    */
   _onStopDragFeature: function(evt) {
     var polygon = this._poly;
-    for (var j = 0, jj = polygon._latlngs.length; j < jj; j++) {
-      for (var i = 0, len = polygon._latlngs[j].length; i < len; i++) {
+    var latlngs = polygon._latlngs;
+
+    if (!L.Util.isArray(latlngs[0])) {
+      latlngs = [latlngs];
+    }
+
+    for (var j = 0, jj = latlngs.length; j < jj; j++) {
+      for (var i = 0, len = latlngs[j].length; i < len; i++) {
         // update marker
         var marker = this._markers[i];
-        marker.setLatLng(polygon._latlngs[j][i]);
+        marker.setLatLng(latlngs[j][i]);
 
         // this one's needed to update the path
-        marker._origLatLng = polygon._latlngs[j][i];
+        marker._origLatLng = latlngs[j][i];
         if (marker._middleLeft) {
           marker._middleLeft.setLatLng(this._getMiddleLatLng(marker._prev, marker));
         }

@@ -35,3 +35,7 @@ h2, h3 {
 
 .leaflet-path-draggable,
 .leaflet-path-draggable path { cursor: move; }
+
+.leaflet-editing-icon {
+  border-radius: 50%;
+}

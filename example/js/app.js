@@ -2,7 +2,6 @@ var L = global.L || require('leaflet');
 var data = require('../data.json');
 var drawControl = require('../../index');
 // require('./L.TouchExtend');
-
 L.Icon.Default.imagePath = "http://cdn.leafletjs.com/leaflet-0.7/images";
 
 ////////////////////////////////////////////////////////////////////////////////
