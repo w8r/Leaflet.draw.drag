@@ -151,6 +151,10 @@ L.Handler.PathDrag = L.Handler.extend(
      * @param  {L.MouseEvent} evt
      */
     _onDragStart: function (evt) {
+      if (!this._path._map) {
+        return;
+      }
+
       var eventType = evt.originalEvent._simulated
         ? "touchstart"
         : evt.originalEvent.type;
@@ -194,6 +198,10 @@ L.Handler.PathDrag = L.Handler.extend(
      * @param  {L.MouseEvent} evt
      */
     _onDrag: function (evt) {
+      if (!this._path._map) {
+        return;
+      }
+
       L.DomEvent.stop(evt);
 
       var first = evt.touches && evt.touches.length >= 1 ? evt.touches[0] : evt;
