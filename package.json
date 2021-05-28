@@ -26,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "leaflet-draw": "github:kili-technology/Leaflet.draw",
-    "leaflet-path-drag": "github:kili-technology/Leaflet.Path.Drag#fix/map-is-null"
+    "leaflet-path-drag": "github:kili-technology/Leaflet.Path.Drag"
   },
   "devDependencies": {
     "browserify": "^13.1.1",
