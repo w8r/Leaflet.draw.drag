@@ -74,7 +74,10 @@ L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */
   removeHooks: function() {
     var poly = this._poly;
 
-    poly.setStyle(poly.options.original);
+    if (poly.options.original) {
+      poly.setStyle(poly.options.original);
+    }
+
     if (this._poly._map) {
       this._poly._map.removeLayer(this._markerGroup);
       this._disableDragging();
