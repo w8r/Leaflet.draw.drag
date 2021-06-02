@@ -7,7 +7,7 @@
     "start": "npm run watch & st -p 3001",
     "watch": "watchify -v -d example/js/app.js -o example/js/bundle.js",
     "lint": "eslint ./src/",
-    "build-js": "cat ./node_modules/leaflet-path-drag/dist/L.Path.Drag-src.js ./src/EditToolbar.Edit.js ./src/Edit.SimpleShape.Drag.js ./src/Edit.Circle.Drag.js ./src/Edit.Rectangle.Drag.js ./src/Edit.Poly.Drag.js > ./dist/Leaflet.draw.drag-src.js",
+    "build-js": "cat src/prelude.js ./node_modules/leaflet-path-drag/dist/L.Path.Drag-src.js ./src/EditToolbar.Edit.js ./src/Edit.SimpleShape.Drag.js ./src/Edit.Circle.Drag.js ./src/Edit.Rectangle.Drag.js ./src/Edit.Poly.Drag.js src/footer.js > ./dist/Leaflet.draw.drag-src.js",
     "compress": "uglifyjs ./dist/Leaflet.draw.drag-src.js -o ./dist/Leaflet.draw.drag.js -m --comments",
     "build": "npm run lint && npm run build-js && npm run compress",
     "release": "git push origin master && git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master && npm publish"
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "browserify": "^13.1.1",
-    "eslint": "^3.10.2",
+    "eslint": "^7.27.0",
     "leaflet": "^1.2.0",
     "st": "^1.2.0",
     "uglify-js": "^2.7.3",

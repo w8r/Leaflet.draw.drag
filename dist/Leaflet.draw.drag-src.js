@@ -1,3 +1,17 @@
+(function (factory, window) {
+  /*globals define, module, require*/
+  // define an AMD module that relies on 'leaflet'
+  if (typeof define === 'function' && define.amd) {
+    define(['leaflet'], factory);
+    // define a Common JS module that relies on 'leaflet'
+  } else if (typeof exports === 'object') {
+    module.exports = factory(require('leaflet'));
+  }
+  // attach your plugin to the global 'L' variable
+  if (typeof window !== 'undefined' && window.L) {
+    factory(window.L);
+  }
+}(function (L) {
 /**
  * Leaflet vector features drag functionality
  * @author Alexander Milevski <info@w8r.name>
@@ -43,6 +57,25 @@ L.Path.include({
 	}
 
 });
+var END = {
+  mousedown:     'mouseup',
+  touchstart:    'touchend',
+  pointerdown:   'touchend',
+  MSPointerDown: 'touchend'
+};
+
+var MOVE = {
+  mousedown:     'mousemove',
+  touchstart:    'touchmove',
+  pointerdown:   'touchmove',
+  MSPointerDown: 'touchmove'
+};
+
+function distance(a, b) {
+  var dx = a.x - b.x, dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 /**
  * Drag handler
  * @class L.Path.Drag
@@ -138,8 +171,8 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
 
     L.DomUtil.addClass(this._path._renderer._container, 'leaflet-interactive');
     L.DomEvent
-      .on(document, L.Draggable.MOVE[eventType], this._onDrag,    this)
-      .on(document, L.Draggable.END[eventType],  this._onDragEnd, this);
+      .on(document, MOVE[eventType], this._onDrag,    this)
+      .on(document, END[eventType],  this._onDragEnd, this);
 
     if (this._path._map.dragging.enabled()) {
       // I guess it's required because mousdown gets simulated with a delay
@@ -221,25 +254,22 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     }
 
 
-    L.DomEvent
-      .off(document, 'mousemove touchmove', this._onDrag, this)
-      .off(document, 'mouseup touchend',    this._onDragEnd, this);
+    L.DomEvent.off(document, 'mousemove touchmove', this._onDrag,    this);
+    L.DomEvent.off(document, 'mouseup touchend',    this._onDragEnd, this);
 
     this._restoreCoordGetters();
 
     // consistency
     if (moved) {
       this._path.fire('dragend', {
-        distance: Math.sqrt(
-          L.LineUtil._sqDist(this._dragStartPoint, containerPoint)
-        )
+        distance: distance(this._dragStartPoint, containerPoint)
       });
 
       // hack for skipping the click in canvas-rendered layers
       var contains = this._path._containsPoint;
       this._path._containsPoint = L.Util.falseFn;
       L.Util.requestAnimFrame(function() {
-        L.DomEvent._skipped({ type: 'click' });
+        L.DomEvent.skipped({ type: 'click' });
         this._path._containsPoint = contains;
       }, this);
     }
@@ -250,7 +280,7 @@ L.Handler.PathDrag = L.Handler.extend( /** @lends  L.Path.Drag.prototype */ {
     this._path._dragMoved = false;
 
     if (this._mapDraggingWasEnabled) {
-      if (moved) L.DomEvent._fakeStop({ type: 'click' });
+      if (moved) L.DomEvent.fakeStop({ type: 'click' });
       this._path._map.dragging.enable();
     }
   },
@@ -464,9 +494,7 @@ L.SVG.include(!L.Browser.vml ? {} : {
 	}
 
 });
-L.Util.trueFn = function() {
-  return true;
-};
+function TRUE_FN () { return true; }
 
 L.Canvas.include({
 
@@ -528,7 +556,7 @@ L.Canvas.include({
 
       // avoid flickering because of the 'mouseover's
       layer._containsPoint_ = layer._containsPoint;
-      layer._containsPoint = L.Util.trueFn;
+      layer._containsPoint  = TRUE_FN;
     }
 
     ctx.save();
@@ -930,7 +958,10 @@ L.Edit.PolyVerticesEdit.include( /** @lends L.Edit.PolyVerticesEdit.prototype */
   removeHooks: function() {
     var poly = this._poly;
 
-    poly.setStyle(poly.options.original);
+    if (poly.options.original) {
+      poly.setStyle(poly.options.original);
+    }
+
     if (this._poly._map) {
       this._poly._map.removeLayer(this._markerGroup);
       this._disableDragging();
@@ -1069,3 +1100,4 @@ L.Edit.PolyVerticesEdit.prototype.options.moveIcon = new L.DivIcon({
 L.Edit.PolyVerticesEdit.mergeOptions({
   moveMarker: false
 });
+}, window));
