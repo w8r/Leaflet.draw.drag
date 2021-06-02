@@ -28,11 +28,16 @@
     "leaflet-draw": "^0.4.12",
     "leaflet-path-drag": "^1.1.0"
   },
+  "files": [
+    "index.js",
+    "src",
+    "dist"
+  ],
   "devDependencies": {
     "browserify": "^13.1.1",
     "eslint": "^7.27.0",
     "leaflet": "^1.2.0",
-    "st": "^1.2.0",
+    "st": "^3.0.0",
     "uglify-js": "^2.7.3",
     "watchify": "^3.7.0"
   }
