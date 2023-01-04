@@ -1,4 +1,5 @@
-var L = global.L || require('leaflet');
+var g = require('global');
+var L = g.L || require('leaflet');
 require('leaflet-draw');
 require('leaflet-path-drag');
 
