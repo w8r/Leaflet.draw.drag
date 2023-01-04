@@ -25,6 +25,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "global": "^4.4.0",
     "leaflet-draw": "^0.4.12",
     "leaflet-path-drag": "^1.1.0"
   },
