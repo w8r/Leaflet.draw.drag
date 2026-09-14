@@ -1,73 +1,85 @@
-# Leaflet.Draw.Drag
+# Leaflet.draw.drag
 
 [![npm version](https://badge.fury.io/js/leaflet-draw-drag.svg)](https://badge.fury.io/js/leaflet-draw-drag)
 
 Drag feature functionality for [Leaflet.draw](https://github.com/Leaflet/Leaflet.draw).
 
-Uses [Leaflet.Path.Drag](https://github.com/w8r/Leaflet.Path.Drag)
+Uses [Leaflet.Path.Drag](https://github.com/w8r/Leaflet.Path.Drag) to make
+every shape you edit with Leaflet.draw draggable, without extra markup.
 
 #### Backwards compatibility
 
-If you want `leaflet@0.7.x` + `leaflet.draw@0.2.x` support, use `leaflet-0.7` branch or
-npm versions `leaflet-draw-drag@^0.1.7`
+If you want `leaflet@0.7.x` + `leaflet.draw@0.2.x` support, use the
+`leaflet-0.7` branch or npm version `leaflet-draw-drag@^0.1.7`. For
+`leaflet@1.x` on the old CommonJS/browserify build, use
+`leaflet-draw-drag@^0.4.8`.
 
-## [Demo](https://w8r.github.io/Leaflet.draw.drag/example/index.html)
+## [Demo](https://w8r.github.io/Leaflet.draw.drag/)
+
+## Install
+
+```bash
+npm install leaflet-draw-drag leaflet-draw leaflet
+```
 
 ## Usage
 
 ```javascript
-<script src="path/to/leaflet/"></script>
-<script src="path/to/leaflet.draw.js"></script>
-<script src="path/to/Edit.Poly.Drag.js"></script>
-...
-var drawnItems = new L.FeatureGroup().addTo(map);
+import L from 'leaflet';
+// leaflet-draw and this plugin are old-style Leaflet plugins that read/write
+// the global `L`, so publish it before loading either of them.
+window.L = L;
+
+import 'leaflet-draw';
+import 'leaflet-draw-drag';
+
+const drawnItems = new L.FeatureGroup().addTo(map);
+
 // Initialise the draw control and pass it the FeatureGroup of editable layers
-var drawControl = new L.Control.Draw({
+const drawControl = new L.Control.Draw({
   edit: {
-    featureGroup: drawnItems
+    featureGroup: drawnItems,
     edit: {
-      moveMarkers: false // centroids, default: false
-    }
-  }
+      selectedPathOptions: {
+        moveMarkers: false, // centroids, default: false
+      },
+    },
+  },
 });
 map.addControl(drawControl);
 // aaand you are good to go, all vector paths are draggable in edit mode
-
 ```
 
-with browserify
+Or straight from a CDN, after `leaflet` and `leaflet-draw`:
 
-```
-npm install leaflet-draw-drag
-...
-
-require('leaflet');
-var drawControl = require('leaflet-draw-drag'); // requires leaflet-draw
+```html
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+<script src="https://unpkg.com/leaflet-draw-drag/dist/index.js"></script>
 ```
 
 ## Info
 
 Uses and includes [Leaflet.Path.Drag](https://github.com/w8r/Leaflet.Path.Drag)
 to extend vector features with drag functionality, so you can create draggable
-polygons and polylines programmatically if you have this one included in your
-app.
+polygons and polylines programmatically even without an active edit session:
 
 ```javascript
-var polygon = new L.Polygon([...], { draggable: true }).addTo(map);
+const polygon = new L.Polygon([...], { draggable: true }).addTo(map);
 polygon
-    .on('dragstart', onDragStart)
-    .on('drag',      onDrag)
-    .on('dragend',   onDragEnd);
+  .on('dragstart', onDragStart)
+  .on('drag', onDrag)
+  .on('dragend', onDragEnd);
 ```
 
 ## Development
 
-```
-npm install && npm start
-```
-Build
-```
-npm run build
+```bash
+npm install
+npm start   # demo at http://localhost:5173
+npm test    # vitest
+npm run build   # lints, builds dist/{index.mjs,index.js,index.cjs,index.d.ts}
+npm run docs    # builds the demo into dist/docs (used for gh-pages)
 ```
 
 ## License
