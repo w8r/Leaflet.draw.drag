@@ -28,13 +28,14 @@
     "src/**/*.mjs"
   ],
   "scripts": {
-    "start": "vite",
+    "start": "vite -c example/vite.config.ts",
     "lint": "eslint ./src --ext .mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "build:types": "node scripts/build-types.mjs",
     "build": "npm run lint && vite build && npm run build:types",
     "docs": "vite build -c example/vite.config.ts",
+    "docs:dev": "vite dev -c example/vite.config.ts",
     "release": "git push origin master && git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master && npm publish"
   },
   "keywords": [
