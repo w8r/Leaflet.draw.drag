@@ -9,11 +9,18 @@
   "unpkg": "dist/index.js",
   "jsdelivr": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": true,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "browser": "./dist/index.js",
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
@@ -39,12 +46,15 @@
   "author": "Alexander Milevski <info@w8r.name>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/w8r/Leaflet.draw.drag.git"
+    "url": "git+https://github.com/w8r/Leaflet.draw.drag.git"
   },
   "bugs": {
     "url": "https://github.com/w8r/Leaflet.draw.drag/issues"
   },
   "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "prettier": {
     "singleQuote": true
   },
