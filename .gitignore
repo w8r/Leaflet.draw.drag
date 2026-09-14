@@ -26,3 +26,10 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# Build output
+dist
+.vite
+
+# Editors
+.DS_Store
